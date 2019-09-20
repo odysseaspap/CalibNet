@@ -1,6 +1,6 @@
-nvcc = /usr/local/cuda-8.0/bin/nvcc
-cudalib = /usr/local/cuda-8.0/lib64/
-tensorflow = /home/ganeshiyer/tensorflow/lib/python2.7/site-packages/tensorflow/include
+nvcc = /usr/local/cuda-10.0/bin/nvcc
+cudalib = /usr/local/cuda-10.0/lib64/
+tensorflow = /opt/anaconda3/envs/thesis/lib/python3.7/site-packages/tensorflow/include
 
 all: tf_nndistance_so.so render_balls_so.so
 .PHONY : all

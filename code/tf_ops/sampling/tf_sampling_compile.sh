@@ -1,3 +1,13 @@
-#/bin/bash
-/usr/local/cuda-8.0/bin/nvcc tf_sampling_g.cu -o tf_sampling_g.cu.o -c -O2 -DGOOGLE_CUDA=1 -x cu -Xcompiler -fPIC
-g++ -std=c++11 tf_sampling.cpp tf_sampling_g.cu.o -o tf_sampling_so.so -shared -fPIC -I /home/ganeshiyer/tensorflow/lib/python2.7/site-packages/tensorflow/include  -I /usr/local/cuda-8.0/include -lcudart -L /usr/local/cuda-8.0/lib64/ -O2 -D_GLIBCXX_USE_CXX11_ABI=0
+#!/usr/bin/env bash
+nvcc=/usr/local/cuda-10.0/bin/nvcc
+cudainc=/usr/local/cuda-10.0/include/
+cudalib=/usr/local/cuda-10.0/lib64/
+python=/opt/anaconda3/envs/thesis/bin/python
+TF_INC=$($python -c 'import tensorflow as tf; print(tf.sysconfig.get_include())')
+TF_LIB=$($python -c 'import tensorflow as tf; print(tf.sysconfig.get_lib())')
+
+$nvcc tf_sampling_g.cu -c -o tf_sampling_g.cu.o -std=c++11  -I $TF_INC -DGOOGLE_CUDA=1\
+ -x cu -Xcompiler -fPIC -O2
+
+g++ tf_sampling.cpp tf_sampling_g.cu.o -o tf_sampling_so.so -std=c++11 -shared -fPIC -I $TF_INC \
+-I$TF_INC/external/nsync/public -I $cudainc -L$TF_LIB -ltensorflow_framework -lcudart -L $cudalib -O2 
