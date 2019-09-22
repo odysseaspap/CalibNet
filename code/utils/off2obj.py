@@ -10,7 +10,7 @@ if len(sys.argv) == 3:
     off_path = sys.argv[1]
     obj_path = sys.argv[2]
 else:
-    print "USAGE: off2obj.py [path to mesh] [output path]"
+    print("USAGE: off2obj.py [path to mesh] [output path]")
     sys.exit(0)
 
 # Class Mesh represents a mesh by a vertex list and a face list
@@ -76,8 +76,8 @@ class Mesh:
 	    XYZ = faceLine.split()
 	    self.faces.append((int(XYZ[1]), int(XYZ[2]), int(XYZ[3])))
 	    if not(int(XYZ[0]) == 3):
-		print "ERROR: This OFF loader can only handle meshes with 3 vertex faces."
-		print "A face with", XYZ[0], "vertices is included in the file. Exiting."
+		print("ERROR: This OFF loader can only handle meshes with 3 vertex faces.")
+		print("A face with", XYZ[0], "vertices is included in the file. Exiting.")
 		offFile.close()
 		sys.exit(0)
 

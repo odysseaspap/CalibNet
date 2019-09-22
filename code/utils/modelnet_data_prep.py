@@ -33,7 +33,7 @@ def tmp(file_path=None):
     file_list = glob.glob('/home/lqyu/workspace/PointSR/data/ModelNet10_test/ModelNet10_MC_2k/*.xyz')
     file_list.sort()
     for file_path in file_list:
-        print file_path
+        print(file_path)
         data_4096 = np.loadtxt(file_path)
         data = data_4096[:, 0:3]
         centroid = np.mean(data, axis=0, keepdims=True)
@@ -96,7 +96,7 @@ def nonuniformsample_from_pointcloud_fn():
     file_list = file_list1
 
     for file_path in tqdm(file_list):
-        print file_path
+        print(file_path)
         phase = file_path.split('/')[-2]
         name = file_path.split('/')[-1].replace("xyz", "xyz")
 
@@ -132,9 +132,9 @@ def possion_sample_fn(file_path):
     xyz_name = os.path.join(SAVE_ROOT_PATH, '20000~', phase, name)
     if not os.path.exists(xyz_name):
         sample_cmd = '../../third_party/PdSampling_nofix %s %s %s' % (str(20000), file_path, xyz_name)
-        print sample_cmd
+        print(sample_cmd)
         if os.system(sample_cmd):
-            print "cannot sample file: %s" % (file_path)
+            print("cannot sample file: %s" % (file_path))
             return 1
 
     # xyz_name = os.path.join(SAVE_ROOT_PATH, '4096', phase, name)
@@ -218,7 +218,7 @@ def recalculateNormal_fn(file_path):
     normal_cmd = 'meshlabserver -i %s -o %s -s ../../third_party/calculate_normal.mlx -om vn' % (
         xyz_name, xyz_normal_name)
     if os.system(normal_cmd):
-        print "cannot calculate normal file: %s" % (file_path)
+        print("cannot calculate normal file: %s" % (file_path))
         return 1
 
     data_ori = np.loadtxt(xyz_normal_name)
@@ -275,7 +275,7 @@ def fix_off_file(filepath):
         line = f.readline()
         if line=='OFF\n':
             return
-        print filepath
+        print(filepath)
         lines = f.readlines()
 
     nums = line.split(' ')
@@ -372,7 +372,7 @@ def save_h52(save_names = ['poisson_4096','poisson_2048']):
     for i in range(catetogy-1):
         assert len(data[i])==len(data[i+1])
     assert len(data[i])==len(names)
-    print len(names)
+    print(len(names))
     h5_fout = h5py.File(h5_filename)
     for i in range(catetogy):
         h5_fout.create_dataset(

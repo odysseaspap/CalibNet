@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     dists_forward, idx1, dists_backward, idx2 = tf_nndistance.nn_distance(gt, pred)
     with tf.Session() as sess:
-        print idx1.eval() # for each element in gt, the idx of pred
-        print idx2.eval() # for each element in pred,
-        print dists_forward.eval()
-        print dists_backward.eval()
+        print(idx1.eval()) # for each element in gt, the idx of pred
+        print(idx2.eval()) # for each element in pred,
+        print(dists_forward.eval())
+        print(dists_backward.eval())
