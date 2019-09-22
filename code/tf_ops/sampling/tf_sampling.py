@@ -61,7 +61,7 @@ if __name__=='__main__':
     import numpy as np
     np.random.seed(100)
     triangles=np.random.rand(1,5,3,3).astype('float32')
-    with tf.device('/gpu:1'):
+    with tf.device('/gpu:0'):
         inp=tf.constant(triangles)
         tria=inp[:,:,0,:]
         trib=inp[:,:,1,:]
@@ -85,5 +85,5 @@ if __name__=='__main__':
     with tf.Session('') as sess:
         ret=sess.run(reduced_sample)
     print(ret.shape,ret.dtype)
-    import cPickle as pickle
+    import pickle
     pickle.dump(ret,open('1.pkl','wb'),-1)

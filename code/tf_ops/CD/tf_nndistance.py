@@ -49,11 +49,11 @@ if __name__=='__main__':
 			reta,retb,retc,retd=nn_distance(inp1,inp2)
 			loss=tf.reduce_sum(reta)+tf.reduce_sum(retc)
 			train=tf.train.GradientDescentOptimizer(learning_rate=0.05).minimize(loss)
-		sess.run(tf.initialize_all_variables())
+		sess.run(tf.global_variables_initializer())
 		t0=time.time()
 		t1=t0
 		best=1e100
-		for i in xrange(100):
+		for i in range(100):
 			trainloss,_=sess.run([loss,train])
 			newt=time.time()
 			best=min(best,newt-t1)

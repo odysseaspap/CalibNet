@@ -80,7 +80,7 @@ if __name__=='__main__':
     pts = np.random.random((32,512,64)).astype('float32')
     tmp1 = np.random.random((32,512,3)).astype('float32')
     tmp2 = np.random.random((32,128,3)).astype('float32')
-    with tf.device('/gpu:1'):
+    with tf.device('/gpu:0'):
         points = tf.constant(pts)
         xyz1 = tf.constant(tmp1)
         xyz2 = tf.constant(tmp2)
@@ -98,8 +98,8 @@ if __name__=='__main__':
         now = time.time() 
         for _ in range(100):
             ret = sess.run(grouped_points)
-        print time.time() - now
-        print ret.shape, ret.dtype
-        print ret
+        print(time.time() - now)
+        print(ret.shape, ret.dtype)
+        print(ret)
     
     

@@ -31,8 +31,8 @@ ops.NoGradient('AuctionMatch')
 # 	]
 
 if __name__=='__main__':
-    from tf_ops.grouping import tf_grouping
-    from tf_ops.sampling import tf_sampling
+    from grouping import tf_grouping
+    from sampling import tf_sampling
 
     npoint=4096
     xyz1_in=tf.placeholder(tf.float32,shape=(32,npoint,3))

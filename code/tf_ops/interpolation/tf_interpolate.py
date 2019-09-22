@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.python.framework import ops
 import sys
 import os
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 interpolate_module=tf.load_op_library(os.path.join(BASE_DIR, 'tf_interpolate_so.so'))
 def three_nn(xyz1, xyz2):
@@ -51,8 +51,8 @@ if __name__=='__main__':
         now = time.time() 
         for _ in range(100):
             ret = sess.run(interpolated_points)
-        print time.time() - now
-        print ret.shape, ret.dtype
+        print(time.time() - now)
+        print(ret.shape, ret.dtype)
         #print ret
     
     

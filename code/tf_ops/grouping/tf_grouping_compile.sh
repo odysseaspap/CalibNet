@@ -2,8 +2,9 @@
 nvcc=/usr/local/cuda-10.0/bin/nvcc
 cudainc=/usr/local/cuda-10.0/include/
 cudalib=/usr/local/cuda-10.0/lib64/
-TF_INC=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_include())')
-TF_LIB=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_lib())')
+python=/opt/anaconda3/envs/thesis/bin/python
+TF_INC=$($python -c 'import tensorflow as tf; print(tf.sysconfig.get_include())')
+TF_LIB=$($python -c 'import tensorflow as tf; print(tf.sysconfig.get_lib())')
 
 $nvcc tf_grouping_g.cu -c -o tf_grouping_g.cu.o -std=c++11 -I $TF_INC -DGOOGLE_CUDA=1\
 	 -x cu -Xcompiler -fPIC -O2
