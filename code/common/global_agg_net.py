@@ -4,10 +4,10 @@ import scipy.misc as smc
 import matplotlib.pyplot as plt
 
 import config_res as config
-from cnn_utils_res import *
+from .cnn_utils_res import *
 
-import resnet_rgb_model as model
-import resnet_depth_model as model_depth
+import common.resnet_rgb_model as model
+import common.resnet_depth_model as model_depth
 
 batch_size = config.net_params['batch_size']
 current_epoch = config.net_params['load_epoch']

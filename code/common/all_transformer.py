@@ -63,7 +63,7 @@ def _3D_meshgrid_batchwise_diff(height, width, depth_img, num_batch, transformat
     sampling_grid_2d_sparse = tf.transpose(tf.boolean_mask(tf.transpose(sampling_grid_2d), mask))
     ZZ_saved = tf.boolean_mask(ZZ, mask)
     ones_saved = tf.expand_dims(tf.ones_like(ZZ_saved), 0)
-
+    # back - project depth image to sparse pointcloud using inverse camera intrinsics matrix
     projection_grid_3d = tf.matmul(tf.matrix_inverse(tf_K_mat), sampling_grid_2d_sparse*ZZ_saved)
 
     homog_points_3d = tf.concat([projection_grid_3d, ones_saved], 0)

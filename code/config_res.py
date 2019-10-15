@@ -31,7 +31,7 @@ depth_img_params = dict(
 # fy: focal length y
 # cx: camera center cx
 # cy: camera center cy
-# cam_transform_02: Transform to color camera 02 (applied after transform)
+# cam_transform_02: Transform from camera 00 to color camera 02 (applied after transform)
 # cam_transform_02_inv: Inverse translation of above
 camera_params = dict(
 	fx = 7.215377e+02,

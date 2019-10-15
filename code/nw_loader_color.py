@@ -47,6 +47,8 @@ def load(p_no, mode):
 
         warped_ip = np.float32(smc.imread(s_name, True))
         warped_ip[0:5,:] = 0.0 ; warped_ip[:,0:5] = 0.0 ; warped_ip[IMG_HT - 5:,:] = 0.0 ; warped_ip[:,IMG_WDT-5:] = 0.0 ;
+        # here they use 40 as mean depth (distance of point from lidar sensor)
+        # and scale depth_image in range [-1,1]
         warped_ip = (warped_ip - 40.0)/40.0
         source_container[c_idx, :, :, 0] = warped_ip
 

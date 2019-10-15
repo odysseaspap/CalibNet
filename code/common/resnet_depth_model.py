@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import json
-from cnn_utils_res import *
+from common.cnn_utils_res import *
 
 import config_res
 

@@ -23,9 +23,9 @@ fx = 7.215377e+02
 fy = 7.215377e+02
 cx = 6.095593e+02
 cy = 1.728540e+02
-
+# cam2 intrinsics calibration
 K = np.array([7.215377e+02, 0.000000e+00, 6.095593e+02, 0.000000e+00, 7.215377e+02, 1.728540e+02, 0.000000e+00, 0.000000e+00, 1.000000e+00]).reshape(3,3)
-
+# velo_to_cam0 = grey camera
 velo_to_cam_R = np.array([7.533745e-03, -9.999714e-01, -6.166020e-04, 1.480249e-02, 7.280733e-04, -9.998902e-01, 9.998621e-01, 7.523790e-03, 1.480755e-02]).reshape(3,3)
 velo_to_cam_T = np.array([-4.069766e-03, -7.631618e-02, -2.717806e-01]).reshape(3,1)
 
@@ -35,7 +35,7 @@ R_rect_00 =  np.array([9.999239e-01, 9.837760e-03, -7.445048e-03, 0.0,
                       -9.869795e-03, 9.999421e-01, -4.278459e-03, 0.0,
                        7.402527e-03, 4.351614e-03, 9.999631e-01,  0.0,
                        0.0,          0.0,          0.0,           1.0]).reshape(4,4)
-
+# cam0 to cam2 (color) transform
 cam_02_transform = np.array([1.0, 0.0, 0.0, 4.485728e+01/fx,
                              0.0, 1.0, 0.0, 2.163791e-01/fy,
                              0.0, 0.0, 1.0, 2.745884e-03,
@@ -130,11 +130,12 @@ for img_name, cloud_name in zip(imgs_files, point_files):
     img = smc.imread(img_name)
     img_ht = img.shape[0]
     img_wdt = img.shape[1]
-
+    # First transforms points from Velo to cam0 coordinates using velo_to_cam
+    # and then applies random decalibration
     points_in_cam_axis = np.matmul(R_rect_00, (np.matmul(velo_to_cam, points.T)))
     transformed_points = np.matmul(random_transform, points_in_cam_axis)
     # transformed_points = transformed_points[:-1,:]
-
+    # transform 3D points to 2D cam2 image plane using cam0 to cam2 transform and cam2 intrinsics K
     points_2d = np.matmul(K, np.matmul(cam_02_transform, transformed_points)[:-1,:])
 
     # points_2d = np.matmul(K, points_in_cam_axis[:-1,:])
@@ -143,16 +144,19 @@ for img_name, cloud_name in zip(imgs_files, point_files):
     x = (points_2d[0,:]/Z).T
     y = (points_2d[1,:]/Z).T
 
+    # clip (remove) pixels outside of img borders
     x = np.clip(x, 0.0, img_wdt - 1)
     y = np.clip(y, 0.0, img_ht - 1)
-
+    # save the transformed (mis-calibrated) depth image
+    # the intensity value of the point is the depth of 3D point
+    # it corresponds to
     reprojected_img = np.zeros_like(img)
     for x_idx, y_idx,z_idx in zip(x,y,Z):
         if(z_idx>0):
             reprojected_img[int(y_idx), int(x_idx)] = z_idx
 
     smc.imsave(depth_maps_transformed_folder + "/" + img_name[-14:], reprojected_img)
-
+    # now these are the correctly calibrated lidar points in 2D cam2 image plane
     points_2d = np.matmul(K, np.matmul(cam_02_transform, points_in_cam_axis)[:-1,:])
 
     Z = points_2d[2,:]

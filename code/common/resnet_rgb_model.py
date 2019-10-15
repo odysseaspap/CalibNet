@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import json
-from cnn_utils_res import *
+from common.cnn_utils_res import *
 import config_res
 
 with open(config_res.paths['resnet_params_path']) as f_in:

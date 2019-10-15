@@ -25,8 +25,9 @@ n_epochs = config.net_params['epochs']
 current_epoch = config.net_params['load_epoch']
 
 tf.reset_default_graph()
-
+# RGB image
 X1 = tf.placeholder(tf.float32, shape = (batch_size, IMG_HT, IMG_WDT, 3), name = "X1")
+# Depth image obtained by projecting a miscalibrated Lidar Pointcloud to cam02 image coordinates
 X2 = tf.placeholder(tf.float32, shape = (batch_size, IMG_HT, IMG_WDT, 1), name = "X2")
 depth_maps_target = tf.placeholder(tf.float32, shape = (batch_size, IMG_HT, IMG_WDT, 1), name = "depth_maps_target")
 expected_transforms = tf.placeholder(tf.float32, shape = (batch_size, 4, 4), name = "expected_transforms")
@@ -40,6 +41,11 @@ fy = config.camera_params['fy']
 cx = config.camera_params['cx']
 cy = config.camera_params['cy']
 
+# They took the scaling from here https://github.com/ankurhanda/gvnn/blob/master/PinHoleCameraProjectionBHWD.lua
+# which took it from here: https://github.com/qassemoquab/stnbhwd/blob/master/BilinearSamplerBHWD.lua
+# but they don't subtract 1 from img_width / height !
+# Note! This does not scale the values of fx, fy, cx and cy to -1,1 but is used because the Grid Generator
+# of the STN outputs a grid in normalized pixel coordinates: [-1,-1] top left to [1,1] bottom right
 fx_scaled = 2*(fx)/np.float32(IMG_WDT)              # focal length x scaled for -1 to 1 range
 fy_scaled = 2*(fy)/np.float32(IMG_HT)               # focal length y scaled for -1 to 1 range
 cx_scaled = -1 + 2*(cx - 1.0)/np.float32(IMG_WDT)   # optical center x scaled for -1 to 1 range
@@ -50,24 +56,30 @@ K_mat_scaled = np.array([[fx_scaled,  0.0, cx_scaled],
                          [0.0, 0.0, 1.0]], dtype = np.float32)
 
 K_final = tf.constant(K_mat_scaled, dtype = tf.float32)
+# transform from cam02 to cam00
 small_transform = tf.constant(config.camera_params['cam_transform_02_inv'], dtype = tf.float32)
 
 
 X2_pooled = tf.nn.max_pool(X2, ksize=[1,5,5,1], strides=[1,1,1,1], padding="SAME")
 depth_maps_target_pooled = tf.nn.max_pool(depth_maps_target, ksize=[1,5,5,1], strides=[1,1,1,1], padding="SAME")
 
+# Output_vectors is a 1x6 vector x = (v,w) in se(3), where v is the translational velocity vector and
+# w the rotational velocity vector
 output_vectors, weight_summaries = global_agg_net.End_Net_Out(X1, phase_rgb, X2_pooled, phase, keep_prob)
 
 # se(3) -> SE(3) for the whole batch
 predicted_transforms = tf.map_fn(lambda x:exponential_map_single(output_vectors[x]), elems=tf.range(0, batch_size, 1), dtype=tf.float32)
 
 # transforms depth maps by the predicted transformation
+# they de-normalize they depth_image (normalization was (image-40)/40 ) here!!
 depth_maps_predicted, cloud_pred = tf.map_fn(lambda x:at3._simple_transformer(X2_pooled[x,:,:,0]*40.0 + 40.0, predicted_transforms[x], K_final, small_transform), elems = tf.range(0, batch_size, 1), dtype = (tf.float32, tf.float32))
 
 # transforms depth maps by the expected transformation
 depth_maps_expected, cloud_exp = tf.map_fn(lambda x:at3._simple_transformer(X2_pooled[x,:,:,0]*40.0 + 40.0, expected_transforms[x], K_final, small_transform), elems = tf.range(0, batch_size, 1), dtype = (tf.float32, tf.float32))
 
 # photometric loss between predicted and expected transformation
+# Note that here they have to re-normalize the depth maps since they de-normalized them before the ST layers!!!
+# plus, they measure the photometric loss only in a 10x10 area in the center of the image!!!
 photometric_loss = tf.nn.l2_loss(tf.subtract((depth_maps_expected[:,10:-10,10:-10] - 40.0)/40.0, (depth_maps_predicted[:,10:-10,10:-10] - 40.0)/40.0))
 
 # earth mover's distance between point clouds
